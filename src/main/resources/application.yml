@@ -1,0 +1,18 @@
+server:
+  port: 8099
+
+spring:
+  application:
+    name: security-app
+  security:
+    oauth2:
+      client:
+        registration:
+          github:
+            client-id:
+            client-secret:
+
+
+logging:
+  level:
+    org.springframework.security: TRACE
