@@ -12,7 +12,9 @@ spring:
             client-id:
             client-secret:
 
+application:
+  secret: "Tell no one"
 
 logging:
-  level:
-    org.springframework.security: TRACE
+    level:
+      org.springframework.security: TRACE

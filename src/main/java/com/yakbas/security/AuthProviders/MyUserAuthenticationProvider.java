@@ -19,7 +19,6 @@ public class MyUserAuthenticationProvider implements AuthenticationProvider {
         }
 
         throw new BadCredentialsException("Wrong username/password. Please try again😎");
-
     }
 
     @Override
