@@ -20,6 +20,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.oauth2.client.OAuth2LoginConfigurer;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -43,7 +44,8 @@ public class SecurityConfig {
             http.getSharedObject(AuthenticationManagerBuilder.class)
                     .authenticationEventPublisher(eventPublisher); // Helps to publish events
 
-            return http.authorizeHttpRequests(
+            return http.csrf().disable()
+                    .authorizeHttpRequests(
                             requestConfig -> {
                                 requestConfig.requestMatchers("/").permitAll();
                                 requestConfig.requestMatchers("/authenticate").permitAll();
@@ -52,6 +54,7 @@ public class SecurityConfig {
                                 requestConfig.anyRequest().authenticated();
                             }
                     ).formLogin(Customizer.withDefaults())
+                    .authenticationProvider(new MyAdminAuthenticationProvider())
                     //.oauth2Login(Customizer.withDefaults()) // we tell spring to use this too.
                     //.oauth2Login(getOAuth2LoginConfigurerCustomizer()) // with post processor 1. variant
                     .oauth2Login().withObjectPostProcessor(
@@ -59,7 +62,11 @@ public class SecurityConfig {
                     ).and() // // with post processor 2. variant
                     .apply(new MyUserLoginConfigurer()).and() // Here goes all the user related stuff.
                     .apply(new JwtLoginConfigurer(jwtService)).and() // Here goes the jwt related stuff
-                    .authenticationProvider(new MyAdminAuthenticationProvider())
+
+                    /*
+                    if you want to just use jwt, activate this line. Otherwise, do not do that :)
+                    .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
+                     */
 
                     .build();
         } catch (Exception e) {
@@ -85,7 +92,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new PasswordEncoder() {
             @Override
             public String encode(CharSequence rawPassword) {
